@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-bm_gen = bmgenerator.BMGenerator(method = 'sobolpca')
+bm_gen = bmgenerator.BMGenerator(method = 'sobolbb')
 model = models.HestonModel(spot = 100, rate = 0.03, nu = 0.1, kappa = 3 , 
                            theta = 0.1, sigma = 0.3, rho = -0.5,bm_generator = bm_gen)
 
