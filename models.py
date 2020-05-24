@@ -12,7 +12,7 @@ class Model:
     def change_min_steps(self,min_n_steps):
         self.min_n_steps = lambda time: int(min_n_steps) * time
     
-    def create_samples(self,n_sim,n_steps,time, random = 0):
+    def create_samples(self,n_sim,n_steps,time):
     
         n_sim = int(n_sim)
         n_steps = int(n_steps)

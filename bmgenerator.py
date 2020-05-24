@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from torch.quasirandom import SobolEngine
 from scipy.stats import norm
 import copy
+import general_brownian_bridge
 
 class BMGenerator:
     def __init__(self,method = 'normal'):
@@ -93,8 +94,12 @@ class BMGenerator:
         pca_dw = pca_bm[:,1:,:] - pca_bm[:,:-1,:]
         
         return pca_dw
-
+    
     def generate_bm_sobolbb(self,n_process, n_steps,n_sim,end_time):
+        dw = general_brownian_bridge.create_general_brownian_bridge(n_sim,n_steps,n_process,end_time)
+        return dw
+        
+    def generate_bm_sobolbb_legacy(self,n_process, n_steps,n_sim,end_time):
         m = int(np.ceil(np.log(n_steps) / np.log(2)))
         h = int(2 ** m)
         times = np.linspace(0, end_time, h + 1)
@@ -131,21 +136,7 @@ class BMGenerator:
                 
             j_max *= 2
             h = i_min
-        
-# =============================================================================
-#         # interpolate if n_steps != h
-#         print(n_steps,int(2 ** m))
-#         if n_steps != int(2 ** m) or True:
-#             print('Interp')
-#             new_times = np.linspace(0, end_time, n_steps + 1)
-#             new_W = np.zeros((n_sim, n_steps + 1, n_process))
-#             for d in range(n_process):
-#                 for i in range(n_sim):
-#                     new_W[i,:,d] = np.interp(new_times, times, W[i,:,d])
-#             
-#             W = new_W
-# =============================================================================
-            
+                
         dw = W[:,1:,:] - W[:,:-1,:]
         return dw
         

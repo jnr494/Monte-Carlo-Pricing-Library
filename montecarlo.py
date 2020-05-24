@@ -16,14 +16,13 @@ class MonteCarlo:
         self.n_sim = int(n_sim)
         self.total_steps = option.get_req_steps() * option.get_maturity()
         
-    def get_paths_vols(self, n_sim, random = 0,):
+    def get_paths_vols(self, n_sim):
          temp_paths, temp_vols =  self.model.create_samples(n_sim = n_sim, 
                                                             n_steps = self.total_steps, 
-                                                            time = self.option.get_maturity(), 
-                                                            random = random)
+                                                            time = self.option.get_maturity())
          return temp_paths, temp_vols
     
-    def estimate_price(self,random = 0, confidence = False):
+    def estimate_price(self, confidence = False):
         #Simulate payoffs
         self.payoffs = np.array([])
         
@@ -31,7 +30,7 @@ class MonteCarlo:
         #print(n_runs)
         
         for _ in range(n_runs):
-            temp_paths, temp_vols = self.get_paths_vols(int(np.ceil(self.n_sim / n_runs)), random = random)
+            temp_paths, temp_vols = self.get_paths_vols(int(np.ceil(self.n_sim / n_runs)))
             temp_payoffs = np.exp(- self.model.rate * self.option.maturity) * self.option.get_payoff(temp_paths, temp_vols)
             self.payoffs = np.append(self.payoffs, temp_payoffs)
         
@@ -46,11 +45,11 @@ class MonteCarlo:
         else:
             return self.price
     
-    def brute_force_confidence(self,reps,random = 1):
+    def brute_force_confidence(self, reps):
         temp_prices = []
         
         for i in range(reps):
-            temp_prices += [self.estimate_price(random,confidence = False)]
+            temp_prices += [self.estimate_price(confidence = False)]
             print(i,temp_prices[-1])
             
         temp_prices = np.array(temp_prices)
