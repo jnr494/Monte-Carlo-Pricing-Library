@@ -36,7 +36,6 @@ mc_pricer.plot_mc_price() #Plot convergence
 print('\nCall option in Black Scholes with use of Sobol numbers and Brownian Bridge construction')
 
 bm_gen_sobolbb = bm_gen = bmgenerator.BMGenerator(method = 'sobolbb') 
-#method can be set to 'normal', 'a' antithetic, 'mm' (moment mathcing), 'sobol', sobolbb (Brownian Bridge) and 'sobolpca'
 
 bs_model = models.BlackScholesModel(spot=100, rate=0, vol=0.2, bm_generator = bm_gen_sobolbb) #Define model
 call_option = options.CallOption(strike = 110, maturity = 1) #Define option
@@ -55,7 +54,6 @@ mc_pricer.plot_mc_price() #Plot convergence
 print('\nCall option in the Heston model without variance reduction')
 
 bm_gen_normal = bm_gen = bmgenerator.BMGenerator(method = 'normal') 
-#method can be set to 'normal', 'a' antithetic, 'mm' (moment mathcing), 'sobol', sobolbb (Brownian Bridge) and 'sobolpca'
 
 heston_model = models.HestonModel(spot = 100, rate = 0.03, nu = 0.1, kappa = 3 , 
                                   theta = 0.1, sigma = 0.3, rho = -0.5,bm_generator = bm_gen) #Define model
@@ -75,7 +73,6 @@ mc_pricer.plot_mc_price() #Plot convergence
 print('\nCall option in the Heston model with use of Sobol numbers and Brownian Bridge construction')
 
 bm_gen_sobolbb = bm_gen = bmgenerator.BMGenerator(method = 'sobolbb') 
-#method can be set to 'normal', 'a' antithetic, 'mm' (moment mathcing), 'sobol', sobolbb (Brownian Bridge) and 'sobolpca'
 
 heston_model = models.HestonModel(spot = 100, rate = 0.03, nu = 0.1, kappa = 3 , 
                                   theta = 0.1, sigma = 0.3, rho = -0.5,bm_generator = bm_gen) #Define model
@@ -96,7 +93,6 @@ mc_pricer.plot_mc_price() #Plot convergence
 print('\nDouble Knock-out-call-option in the Heston model with use of Sobol numbers and Brownian Bridge construction')
 
 bm_gen_sobolbb = bm_gen = bmgenerator.BMGenerator(method = 'sobolbb') 
-#method can be set to 'normal', 'a' antithetic, 'mm' (moment mathcing), 'sobol', sobolbb (Brownian Bridge) and 'sobolpca'
 
 heston_model = models.HestonModel(spot = 100, rate = 0.03, nu = 0.1, kappa = 3 , 
                                   theta = 0.1, sigma = 0.3, rho = -0.5,bm_generator = bm_gen) #Define model

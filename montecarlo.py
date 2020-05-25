@@ -63,9 +63,14 @@ class MonteCarlo:
         
     def plot_mc_price(self):
         montes = np.cumsum(self.payoffs) / np.arange(1,len(self.payoffs)+1)
+        
+        payoff_std = np.std(self.payoffs)
+        n_payoffs = len(self.payoffs)
+        
         plt.plot(montes)
-        plt.plot(montes - 1.96 * np.std(self.payoffs) / np.sqrt(np.arange(1,len(self.payoffs)+1)), color = 'r',linewidth=0.5)
-        plt.plot(montes + 1.96 * np.std(self.payoffs) / np.sqrt(np.arange(1,len(self.payoffs)+1)), color = 'r',linewidth=0.5)
-        plt.ylim(np.mean(self.payoffs)*np.array([0.95,1.05]))
+        plt.plot(montes - 1.96 * payoff_std / np.sqrt(np.arange(1,n_payoffs+1)), color = 'r',linewidth=0.5)
+        plt.plot(montes + 1.96 * payoff_std / np.sqrt(np.arange(1,n_payoffs+1)), color = 'r',linewidth=0.5)
+        
+        plt.ylim(np.mean(self.payoffs) + 5 * np.array([-1.96,1.96]) * payoff_std / np.sqrt(n_payoffs))
         plt.show()
 
