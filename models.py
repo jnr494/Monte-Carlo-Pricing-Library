@@ -5,10 +5,19 @@ Created on Sat Apr 11 12:46:52 2020
 @author: Magnus Frandsen
 """
 
+from abc import ABCMeta, abstractmethod
 import numpy as np
 import copy
 
-class Model:
+
+class Model(metaclass = ABCMeta):
+    def __init__(self,min_n_steps, init_vol, n_random_var, bm_generator):
+        self.min_n_steps = min_n_steps
+        self.init_vol = init_vol
+        self. n_random_var = n_random_var
+        self.bm_generator = bm_generator
+    
+    
     def change_min_steps(self,min_n_steps):
         self.min_n_steps = lambda time: int(min_n_steps) * time
     
@@ -51,6 +60,10 @@ class Model:
                 sample_vols[:,int(i / step_freq) + 1] = current_vols       
             
         return sample_paths, sample_vols
+    
+    @abstractmethod
+    def move_samples_vols(self,current_paths,current_vols,dt,temp_dw):
+        pass
 
 class BlackScholesModel(Model):
     def __init__(self,spot,rate,vol, bm_generator):
@@ -58,11 +71,9 @@ class BlackScholesModel(Model):
         self.rate = rate
         self.vol = vol
         
-        self.min_n_steps = lambda time: 1
-        self.init_vol = vol
-        self.n_random_var = 1
-
-        self.bm_generator = copy.deepcopy(bm_generator)
+        super().__init__(min_n_steps = lambda time: 1, init_vol = vol, n_random_var = 1, 
+                                               bm_generator = bm_generator)
+        
         
     def move_samples_vols(self,current_paths,current_vols,dt,temp_dw):
         
@@ -81,11 +92,8 @@ class HestonModel(Model):
         self.sigma = sigma
         self.rho = rho
         
-        self.min_n_steps = lambda time: min_n_steps * time
-        self.init_vol = np.sqrt(nu) 
-        self.n_random_var = 2
-    
-        self.bm_generator = copy.deepcopy(bm_generator)
+        super().__init__(min_n_steps = lambda time: min_n_steps * time, init_vol = np.sqrt(nu), 
+                         n_random_var = 2, bm_generator = bm_generator)
     
     def move_samples_vols(self,current_paths,current_vols,dt,temp_dw):
         current_vols = copy.deepcopy(current_vols)
@@ -115,11 +123,8 @@ class SABRModel(Model):
         self. alpha = alpha
         self.rho = rho
         
-        self.min_n_steps = lambda time: min_n_steps * time
-        self.init_vol = sigma
-        self.n_random_var = 2
-        
-        self.bm_generator = copy.deepcopy(bm_generator)
+        super().__init__(min_n_steps = lambda time: min_n_steps * time, init_vol = sigma, 
+                         n_random_var = 2, bm_generator = bm_generator)
     
     def move_samples_vols(self,current_paths,current_vols,dt,temp_dw):
         current_vols = copy.deepcopy(current_vols)
@@ -134,3 +139,4 @@ class SABRModel(Model):
                                * (self.rho * temp_dw[:,0] + np.sqrt(1 - self.rho**2) * temp_dw[:,1]))
         
         return current_paths, current_vols
+

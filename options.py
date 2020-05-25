@@ -6,20 +6,29 @@ Created on Sat Apr 11 16:58:39 2020
 """
 
 import numpy as np
+from abc import ABCMeta, abstractmethod
 
-class Option:
+class Option(metaclass=ABCMeta):
+    def __init__(self,maturity, req_steps):
+        self.maturity = maturity
+        self.req_steps = req_steps
+        
     def get_req_steps(self):
         return self.req_steps
     
     def get_maturity(self):
         return self.maturity
-
+    
+    @abstractmethod
+    def get_payoff(self,sample_paths,sample_vols):
+        pass
+    
+    
 class CallOption(Option):
     def __init__(self,strike,maturity):
         self.strike = strike
-        self.maturity = maturity
         
-        self.req_steps = 1
+        super().__init__(maturity = maturity, req_steps = 1)
         
     def get_payoff(self,sample_paths,sample_vols):
         payoffs = np.maximum(0,sample_paths[:,-1] - self.strike)
@@ -28,9 +37,8 @@ class CallOption(Option):
 class PutOption(Option):
     def __init__(self,strike,maturity):
         self.strike = strike
-        self.maturity = maturity
         
-        self.req_steps = 1
+        super().__init__(maturity = maturity, req_steps = 1)
         
     def get_payoff(self,sample_paths,sample_vols):
         payoffs = np.maximum(0,self.strike - sample_paths[:,-1])
@@ -39,9 +47,8 @@ class PutOption(Option):
 class Digital(Option):
     def __init__(self,strike,maturity):
         self.strike = strike
-        self.maturity = maturity
-    
-        self.req_steps = 1
+        
+        super().__init__(maturity = maturity, req_steps = 1)
     
     def get_payoff(self,sample_paths,sample_vols):
         payoffs = (sample_paths[:,-1] >= self.strike) * 1
@@ -49,9 +56,7 @@ class Digital(Option):
 
 class ForwardCall(Option):
     def __init__(self,maturity,steps):
-        self.maturity = maturity
-    
-        self.req_steps = steps
+        super().__init__(maturity = maturity, req_steps = steps)
     
     def get_payoff(self,sample_paths,sample_vols):
         payoffs = sample_paths[:,-1] - np.min(sample_paths, axis = 1)
@@ -59,16 +64,17 @@ class ForwardCall(Option):
 
 class ForwardPut(Option):
     def __init__(self,maturity,steps):
-        self.maturity = maturity
-    
-        self.req_steps = steps
+        super().__init__(maturity = maturity, req_steps = steps)
     
     def get_payoff(self,sample_paths,sample_vols):
         payoffs = - np.max(sample_paths, axis = 1) - sample_paths[:,-1] 
         return payoffs.flatten()
 
 
-class BarrierOption(Option):
+class BarrierOption(Option,metaclass = ABCMeta):
+    def __init__(self,option, maturity, req_steps):
+        self.option = option
+        super().__init__(maturity, req_steps)
     
     def get_barrier_p(self, sample_paths, sample_vols, barrier):
         n_steps = len(sample_paths[0,:]) - 1
@@ -84,14 +90,15 @@ class BarrierOption(Option):
         
         return p_high.flatten()
     
+    @abstractmethod
+    def get_payoff(self,sample_paths,sample_vols):
+        pass
 
 class UpAndOut(BarrierOption):
     def __init__(self,option, maturity, high_barrier):
-        self.option = option
-        self.maturity = maturity
         self.high_barrier = high_barrier
         
-        self.req_steps = 2**8
+        super().__init__(option = option, maturity = maturity, req_steps = 200)
     
     def get_payoff(self, sample_paths, sample_vols, brownian_bridge = True):
         pre_payoffs = self.option.get_payoff(sample_paths,sample_vols).flatten()
@@ -104,11 +111,9 @@ class UpAndOut(BarrierOption):
 
 class DownAndOut(BarrierOption):
     def __init__(self,option, maturity, low_barrier):
-        self.option = option
-        self.maturity = maturity
         self.low_barrier = low_barrier
         
-        self.req_steps = 2**8
+        super().__init__(option = option, maturity = maturity, req_steps = 200)
         
     
     def get_payoff(self, sample_paths, sample_vols, brownian_bridge = True):
@@ -122,13 +127,11 @@ class DownAndOut(BarrierOption):
 
 class DoubleKnockOut(BarrierOption):
     def __init__(self,option, maturity, low_barrier, high_barrier):
-        self.option = option
-        self.maturity = maturity
         self.low_barrier = low_barrier
         self.high_barrier = high_barrier
         
-        self.req_steps = 200
-    
+        super().__init__(option = option, maturity = maturity, req_steps = 200)
+
     def get_payoff(self, sample_paths, sample_vols, brownian_bridge = True):
         pre_payoffs = self.option.get_payoff(sample_paths,sample_vols).flatten()
         
