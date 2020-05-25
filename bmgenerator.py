@@ -17,7 +17,7 @@ class BMGenerator:
     def __init__(self,method = 'normal'):
         methods = ['normal','a','mm','sobol','sobolpca','sobolbb']
         if str(method).lower() in methods:    
-            self.method = method
+            self.method = copy.deepcopy(method)
         else:
             self.method = 'normal'
     
@@ -110,8 +110,6 @@ class BMGenerator:
         Z = norm.ppf(np.array(Sobol.draw(n_sim))*(1-2e-7)+1e-7)
         split = [list(range(n_process * h))[i::n_process] for i in range(n_process)]
         Z = np.dstack(tuple([Z[:,i] for i in split]))
-        
-        #Z = np.random.normal(size=(n_sim, h, n_process))
         
         #Create bm via brownian bridge - see almgorithm from fig 3.2 in Glasserman2010
         j_max = 1

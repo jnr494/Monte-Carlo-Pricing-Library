@@ -7,11 +7,12 @@ Created on Sun Apr 12 00:32:27 2020
 
 import numpy as np
 import matplotlib.pyplot as plt
+import copy
 
 class MonteCarlo:
     def __init__(self, model, option, n_sim):
-        self.model = model
-        self.option = option
+        self.model = copy.deepcopy(model)
+        self.option = copy.deepcopy(option)
         
         self.n_sim = int(n_sim)
         self.total_steps = option.get_req_steps() * option.get_maturity()

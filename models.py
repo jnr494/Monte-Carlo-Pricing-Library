@@ -62,7 +62,8 @@ class BlackScholesModel(Model):
         self.init_vol = vol
         self.n_random_var = 1
 
-        self.bm_generator = bm_generator
+        self.bm_generator = copy.deepcopy(bm_generator)
+        
     def move_samples_vols(self,current_paths,current_vols,dt,temp_dw):
         
         current_paths *= np.array(np.exp((self.rate - current_vols**2/2)*dt \
@@ -84,7 +85,7 @@ class HestonModel(Model):
         self.init_vol = np.sqrt(nu) 
         self.n_random_var = 2
     
-        self.bm_generator = bm_generator
+        self.bm_generator = copy.deepcopy(bm_generator)
     
     def move_samples_vols(self,current_paths,current_vols,dt,temp_dw):
         current_vols = copy.deepcopy(current_vols)
@@ -118,7 +119,7 @@ class SABRModel(Model):
         self.init_vol = sigma
         self.n_random_var = 2
         
-        self.bm_generator = bm_generator
+        self.bm_generator = copy.deepcopy(bm_generator)
     
     def move_samples_vols(self,current_paths,current_vols,dt,temp_dw):
         current_vols = copy.deepcopy(current_vols)

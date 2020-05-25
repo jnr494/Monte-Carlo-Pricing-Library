@@ -120,14 +120,14 @@ class DownAndOut(BarrierOption):
         payoffs = payoffs * self.get_barrier_p(sample_paths,sample_vols,self.low_barrier) if brownian_bridge else payoffs          
         return payoffs
 
-class DoubleKnoutOut(BarrierOption):
+class DoubleKnockOut(BarrierOption):
     def __init__(self,option, maturity, low_barrier, high_barrier):
         self.option = option
         self.maturity = maturity
         self.low_barrier = low_barrier
         self.high_barrier = high_barrier
         
-        self.req_steps = 2**8
+        self.req_steps = 200
     
     def get_payoff(self, sample_paths, sample_vols, brownian_bridge = True):
         pre_payoffs = self.option.get_payoff(sample_paths,sample_vols).flatten()

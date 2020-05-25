@@ -11,7 +11,6 @@ import numpy as np
 from scipy.stats import norm
 from torch.quasirandom import SobolEngine
 
-n_steps = 200
 def create_general_brownian_bridge(n_sim, n_steps, n_process, end_time):
     #Create instructions for the creation of the brownian bridge
     
@@ -64,14 +63,15 @@ def create_general_brownian_bridge(n_sim, n_steps, n_process, end_time):
     #Create bm via brownian bridge
     W[:,n_steps,:] = np.sqrt(times[n_steps]) * Z[:,0,:]
     
-    cur_z_nr = 1
-    for item in ex_list:
-        i, l, r = item
-        a = ((times[r] - times[i])*W[:,l,:] + (times[i] - times[l])*W[:,r,:]) / (times[r] - times[l])
-        b = np.sqrt((times[i] - times[l]) * (times[r] - times[i]) / (times[r] - times[l]))
-        W[:,i,:] = a + b * Z[:,cur_z_nr,:]
-        
-        cur_z_nr += 1
+    if n_steps > 1:
+        cur_z_nr = 1
+        for item in ex_list:
+            i, l, r = item
+            a = ((times[r] - times[i])*W[:,l,:] + (times[i] - times[l])*W[:,r,:]) / (times[r] - times[l])
+            b = np.sqrt((times[i] - times[l]) * (times[r] - times[i]) / (times[r] - times[l]))
+            W[:,i,:] = a + b * Z[:,cur_z_nr,:]
+            
+            cur_z_nr += 1
     
     dw = W[:,1:,:] - W[:,:-1,:]
     return dw
