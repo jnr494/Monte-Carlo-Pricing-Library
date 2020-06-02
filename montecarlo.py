@@ -15,7 +15,7 @@ class MonteCarlo:
         self.option = copy.deepcopy(option)
         
         self.n_sim = int(n_sim)
-        self.total_steps = option.get_req_steps() * option.get_maturity()
+        self.total_steps = max(1,option.get_req_steps() * option.get_maturity())
         
     def get_paths_vols(self, n_sim):
          temp_paths, temp_vols =  self.model.create_samples(n_sim = n_sim, 
@@ -74,3 +74,19 @@ class MonteCarlo:
         plt.ylim(np.mean(self.payoffs) + 5 * np.array([-1.96,1.96]) * payoff_std / np.sqrt(n_payoffs))
         plt.show()
 
+if __name__ == '__main__':
+    import bmgenerator
+    import models
+    import options
+    import time
+    
+    option = options.PutOption(100,1)
+    #model= models.BlackScholesModel(100, 0.05, 0.2, bmgenerator.BMGenerator('sobolbb'))
+    model= models.HestonModel(100, 0.02, 0.1, 3, 0.1, 0.2, -0.7, bmgenerator.BMGenerator('sobolbb'))
+    
+    t0 = time.time()
+    mt_pricer = MonteCarlo(model,option, 1e4)
+    price = mt_pricer.estimate_price()
+    t1 = time.time()
+    print(t1-t0)
+    mt_pricer.plot_mc_price()
